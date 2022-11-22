@@ -44,7 +44,7 @@ const BodyBytesKey = "_gin-gonic/gin/bodybyteskey"
 const ContextKey = "_gin-gonic/gin/contextkey"
 
 // abortIndex represents a typical value used in abort functions.
-const abortIndex int8 = math.MaxInt8 >> 1
+const abortIndex int8 = math.MaxInt8
 
 // Context is the most important part of gin. It allows us to pass variables between middleware,
 // manage the flow, validate the JSON of a request and render a JSON response for example.
