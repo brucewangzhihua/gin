@@ -14,8 +14,8 @@ import (
 	"strings"
 	"testing"
 
+	testdata "github.com/brucewangzhihua/gin/testdata/protoexample"
 	"github.com/stretchr/testify/assert"
-	testdata " github.com/brucewangzhihua/gin/testdata/protoexample"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -173,7 +173,7 @@ func TestRenderAsciiJSON(t *testing.T) {
 	assert.Equal(t, "application/json", w1.Header().Get("Content-Type"))
 
 	w2 := httptest.NewRecorder()
-	data2 := 3.1415926
+	data2 := float64(3.1415926)
 
 	err = (AsciiJSON{data2}).Render(w2)
 	assert.NoError(t, err)

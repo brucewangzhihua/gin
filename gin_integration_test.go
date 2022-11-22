@@ -9,7 +9,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"html/template"
-	"io"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"net/http/httptest"
@@ -43,7 +43,7 @@ func testRequest(t *testing.T, params ...string) {
 	assert.NoError(t, err)
 	defer resp.Body.Close()
 
-	body, ioerr := io.ReadAll(resp.Body)
+	body, ioerr := ioutil.ReadAll(resp.Body)
 	assert.NoError(t, ioerr)
 
 	var responseStatus = "200 OK"

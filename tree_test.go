@@ -229,7 +229,7 @@ func TestTreeWildcard(t *testing.T) {
 		{"/a", false, "/:cc", Params{Param{Key: "cc", Value: "a"}}},
 		// * Error with argument being intercepted
 		// new PR handle (/all /all/cc /a/cc)
-		// fix PR: https:// github.com/brucewangzhihua/gin/pull/2796
+		// fix PR: https://github.com/brucewangzhihua/gin/pull/2796
 		{"/all", false, "/:cc", Params{Param{Key: "cc", Value: "all"}}},
 		{"/d", false, "/:cc", Params{Param{Key: "cc", Value: "d"}}},
 		{"/ad", false, "/:cc", Params{Param{Key: "cc", Value: "ad"}}},
@@ -681,26 +681,6 @@ func TestTreeRootTrailingSlashRedirect(t *testing.T) {
 		t.Fatalf("non-nil handler")
 	} else if value.tsr {
 		t.Errorf("expected no TSR recommendation")
-	}
-}
-
-func TestRedirectTrailingSlash(t *testing.T) {
-	var data = []struct {
-		path string
-	}{
-		{"/hello/:name"},
-		{"/hello/:name/123"},
-		{"/hello/:name/234"},
-	}
-
-	node := &node{}
-	for _, item := range data {
-		node.addRoute(item.path, fakeHandler("test"))
-	}
-
-	value := node.getValue("/hello/abx/", nil, getSkippedNodes(), false)
-	if value.tsr != true {
-		t.Fatalf("want true, is false")
 	}
 }
 

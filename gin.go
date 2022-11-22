@@ -14,8 +14,8 @@ import (
 	"strings"
 	"sync"
 
-	" github.com/brucewangzhihua/gin/internal/bytesconv"
-	" github.com/brucewangzhihua/gin/render"
+	"github.com/brucewangzhihua/gin/internal/bytesconv"
+	"github.com/brucewangzhihua/gin/render"
 	"golang.org/x/net/http2"
 	"golang.org/x/net/http2/h2c"
 )
@@ -166,7 +166,7 @@ type Engine struct {
 	trustedCIDRs     []*net.IPNet
 }
 
-var _ IRouter = (*Engine)(nil)
+var _ IRouter = &Engine{}
 
 // New returns a new blank Engine instance without any middleware attached.
 // By default, the configuration is:
@@ -203,7 +203,7 @@ func New() *Engine {
 	}
 	engine.RouterGroup.engine = engine
 	engine.pool.New = func() any {
-		return engine.allocateContext(engine.maxParams)
+		return engine.allocateContext()
 	}
 	return engine
 }
@@ -225,8 +225,8 @@ func (engine *Engine) Handler() http.Handler {
 	return h2c.NewHandler(engine, h2s)
 }
 
-func (engine *Engine) allocateContext(maxParams uint16) *Context {
-	v := make(Params, 0, maxParams)
+func (engine *Engine) allocateContext() *Context {
+	v := make(Params, 0, engine.maxParams)
 	skippedNodes := make([]skippedNode, 0, engine.maxSections)
 	return &Context{engine: engine, params: &v, skippedNodes: &skippedNodes}
 }
@@ -374,7 +374,7 @@ func (engine *Engine) Run(addr ...string) (err error) {
 
 	if engine.isUnsafeTrustedProxies() {
 		debugPrint("[WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.\n" +
-			"Please check https://pkg.go.dev/ github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
+			"Please check https://pkg.go.dev/github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
 	}
 
 	address := resolveAddress(addr)
@@ -495,7 +495,7 @@ func (engine *Engine) RunTLS(addr, certFile, keyFile string) (err error) {
 
 	if engine.isUnsafeTrustedProxies() {
 		debugPrint("[WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.\n" +
-			"Please check https://pkg.go.dev/ github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
+			"Please check https://pkg.go.dev/github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
 	}
 
 	err = http.ListenAndServeTLS(addr, certFile, keyFile, engine.Handler())
@@ -511,7 +511,7 @@ func (engine *Engine) RunUnix(file string) (err error) {
 
 	if engine.isUnsafeTrustedProxies() {
 		debugPrint("[WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.\n" +
-			"Please check https://pkg.go.dev/ github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
+			"Please check https://pkg.go.dev/github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
 	}
 
 	listener, err := net.Listen("unix", file)
@@ -534,7 +534,7 @@ func (engine *Engine) RunFd(fd int) (err error) {
 
 	if engine.isUnsafeTrustedProxies() {
 		debugPrint("[WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.\n" +
-			"Please check https://pkg.go.dev/ github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
+			"Please check https://pkg.go.dev/github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
 	}
 
 	f := os.NewFile(uintptr(fd), fmt.Sprintf("fd@%d", fd))
@@ -555,7 +555,7 @@ func (engine *Engine) RunListener(listener net.Listener) (err error) {
 
 	if engine.isUnsafeTrustedProxies() {
 		debugPrint("[WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.\n" +
-			"Please check https://pkg.go.dev/ github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
+			"Please check https://pkg.go.dev/github.com/brucewangzhihua/gin#readme-don-t-trust-all-proxies for details.")
 	}
 
 	err = http.Serve(listener, engine.Handler())

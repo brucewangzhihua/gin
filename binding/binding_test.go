@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -18,8 +19,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/brucewangzhihua/gin/testdata/protoexample"
 	"github.com/stretchr/testify/assert"
-	" github.com/brucewangzhihua/gin/testdata/protoexample"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -655,12 +656,12 @@ func TestBindingFormFilesMultipart(t *testing.T) {
 	// file from os
 	f, _ := os.Open("form.go")
 	defer f.Close()
-	fileActual, _ := io.ReadAll(f)
+	fileActual, _ := ioutil.ReadAll(f)
 
 	// file from multipart
 	mf, _ := obj.File.Open()
 	defer mf.Close()
-	fileExpect, _ := io.ReadAll(mf)
+	fileExpect, _ := ioutil.ReadAll(mf)
 
 	assert.Equal(t, FormMultipart.Name(), "multipart/form-data")
 	assert.Equal(t, obj.Foo, "bar")
@@ -1106,7 +1107,9 @@ func testFormBindingForType(t *testing.T, method, path, badPath, body, badBody s
 		assert.Equal(t,
 			struct {
 				Idx int "form:\"idx\""
-			}{Idx: 123},
+			}(struct {
+				Idx int "form:\"idx\""
+			}{Idx: 123}),
 			obj.StructFoo)
 	case "StructPointer":
 		obj := FooStructForStructPointerType{}
@@ -1115,7 +1118,9 @@ func testFormBindingForType(t *testing.T, method, path, badPath, body, badBody s
 		assert.Equal(t,
 			struct {
 				Name string "form:\"name\""
-			}{Name: "thinkerou"},
+			}(struct {
+				Name string "form:\"name\""
+			}{Name: "thinkerou"}),
 			*obj.StructPointerFoo)
 	case "Map":
 		obj := FooStructForMapType{}
@@ -1346,13 +1351,13 @@ func testProtoBodyBindingFail(t *testing.T, b Binding, name, path, badPath, body
 	obj := protoexample.Test{}
 	req := requestWithBody("POST", path, body)
 
-	req.Body = io.NopCloser(&hook{})
+	req.Body = ioutil.NopCloser(&hook{})
 	req.Header.Add("Content-Type", MIMEPROTOBUF)
 	err := b.Bind(req, &obj)
 	assert.Error(t, err)
 
 	invalidobj := FooStruct{}
-	req.Body = io.NopCloser(strings.NewReader(`{"msg":"hello"}`))
+	req.Body = ioutil.NopCloser(strings.NewReader(`{"msg":"hello"}`))
 	req.Header.Add("Content-Type", MIMEPROTOBUF)
 	err = b.Bind(req, &invalidobj)
 	assert.Error(t, err)

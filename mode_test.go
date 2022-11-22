@@ -9,8 +9,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/brucewangzhihua/gin/binding"
 	"github.com/stretchr/testify/assert"
-	" github.com/brucewangzhihua/gin/binding"
 )
 
 func init() {

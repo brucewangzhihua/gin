@@ -12,8 +12,6 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
-	"runtime"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,17 +28,9 @@ func (i interceptedWriter) WriteHeader(code int) {
 }
 
 func TestContextFormFileFailed17(t *testing.T) {
-	if !isGo117OrGo118() {
-		return
-	}
 	buf := new(bytes.Buffer)
 	mw := multipart.NewWriter(buf)
-	defer func(mw *multipart.Writer) {
-		err := mw.Close()
-		if err != nil {
-			assert.Error(t, err)
-		}
-	}(mw)
+	mw.Close()
 	c, _ := CreateTestContext(httptest.NewRecorder())
 	c.Request, _ = http.NewRequest("POST", "/", nil)
 	c.Request.Header.Set("Content-Type", mw.FormDataContentType())
@@ -79,16 +69,4 @@ func TestInterceptedHeader(t *testing.T) {
 	// middleware. Assert this
 	assert.Equal(t, "", w.Result().Header.Get("X-Test"))
 	assert.Equal(t, "present", w.Result().Header.Get("X-Test-2"))
-}
-
-func isGo117OrGo118() bool {
-	version := strings.Split(runtime.Version()[2:], ".")
-	if len(version) >= 2 {
-		x := version[0]
-		y := version[1]
-		if x == "1" && (y == "17" || y == "18") {
-			return true
-		}
-	}
-	return false
 }
